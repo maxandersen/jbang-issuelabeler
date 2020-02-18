@@ -19,7 +19,6 @@ import static java.lang.System.*;
         description = "issue_labeler made with jbang")
 class issue_labeler implements Callable<Integer> {
 
-
     public static void main(String... args) {
         int exitCode = new CommandLine(new issue_labeler()).execute(args);
         exit(exitCode);
