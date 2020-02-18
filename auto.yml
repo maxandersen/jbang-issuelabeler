@@ -1,0 +1,5 @@
+- labels: [area/hibernate, need-review]
+  title: "(?i).*hibernate.*"
+  description: "(?i).*hibernate.*"
+- labels: [name]
+  title: ".*"
