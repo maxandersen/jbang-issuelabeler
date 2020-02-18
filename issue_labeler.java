@@ -3,6 +3,7 @@
 //DEPS org.kohsuke:github-api:1.101
 //DEPS com.fasterxml.jackson.core:jackson-databind:2.2.3
 //DEPS com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.9
+//DEPS org.glassfish:jakarta.el:3.0.3
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -19,6 +20,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import javax.el.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -120,16 +122,9 @@ class issue_labeler implements Callable<Integer> {
     public static class Rule {
 
         List<String> labels;
+        String expression;
         Pattern title;
         Pattern description;
-
-        public List<String> getLabels() {
-            return labels;
-        }
-
-        public void setLabels(List<String> labels) {
-            this.labels = labels;
-        }
 
         public String getTitle() {
             return title.toString();
@@ -146,6 +141,22 @@ class issue_labeler implements Callable<Integer> {
         public void setDescription(String description) {
             this.description = Pattern.compile(description);
         }
+        public String getExpression() {
+            return expression;
+        }
+
+        public void setExpression(String expression) {
+            this.expression = expression;
+        }
+
+
+        public List<String> getLabels() {
+            return labels;
+        }
+
+        public void setLabels(List<String> labels) {
+            this.labels = labels;
+        }
 
         boolean matches(String issue_title, String issue_description) {
 
@@ -157,8 +168,20 @@ class issue_labeler implements Callable<Integer> {
                 return true;
             }
 
-            return false;
 
+            //https://www.programcreek.com/java-api-examples/?api=javax.el.ExpressionFactory
+            var elfactory = ELManager.getExpressionFactory();
+
+            ELContext context = new StandardELContext(elfactory);
+            context.getVariableMapper().setVariable("title", elfactory.createValueExpression(issue_title, String.class));
+            context.getVariableMapper().setVariable("description", elfactory.createValueExpression(issue_title, String.class));
+
+            System.out.println(expression);
+            var ve = elfactory.createValueExpression(context, expression, Boolean.class);
+
+            var value = (Boolean)ve.getValue(context);
+
+            return value;
         }
     }
 

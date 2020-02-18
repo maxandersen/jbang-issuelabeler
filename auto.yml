@@ -1,5 +1,5 @@
 - labels: [area/hibernate, need-review]
-  title: "(?i).*hibernate.*"
-  description: "(?i).*hibernate.*"
-- labels: [name]
-  title: ".*"
+  expression: |
+            ${title.matches("(?i).*hibernate.*") or 
+              description.matches("(?i).*hibernate.*")}
+  
