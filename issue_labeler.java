@@ -34,7 +34,7 @@ import static picocli.CommandLine.*;
         description = "issue_labeler made with jbang")
 class issue_labeler implements Callable<Integer> {
 
-    @Option(names={"--token"}, defaultValue = "${env:GITHUB_TOKEN}",
+    @Option(names={"--token"}, defaultValue = "${GITHUB_TOKEN}",
                         description = "Token to use for github (env: $GITHUB_TOKEN)", required = true)
     String githubToken;
 
@@ -44,12 +44,12 @@ class issue_labeler implements Callable<Integer> {
     String githubRepository;
     */
 
-    @Option(names={"--eventpath"}, defaultValue = "${env:GITHUB_EVENT_PATH}",
+    @Option(names={"--eventpath"}, defaultValue = "${GITHUB_EVENT_PATH}",
             description = "Path to read webhook event data", required = true)
     File githubEventpath;
 
 
-    @Option(names={"--config"}, defaultValue = ".github/autoissuelabeler.yml")
+    @Option(names={"--config"}, defaultValue = "${CONFIG:-.github/autoissuelabeler.yml}")
     String config;
 
     public static void main(String... args) {
