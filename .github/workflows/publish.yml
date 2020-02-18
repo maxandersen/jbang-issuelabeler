@@ -1,0 +1,17 @@
+on: [push]
+
+jobs:
+    jbang:
+      runs-on: ubuntu-latest
+      name: publish
+      steps:
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: publish
+        uses: jerray/publish-docker-action@master
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: maxandersen/jbang-issuelabeler
+          auto_tag: true
+
