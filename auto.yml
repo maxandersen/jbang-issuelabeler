@@ -4,5 +4,4 @@
               title_description.matches("(?is).*hibernate.*") 
               and
               !title_description.matches("(?is).*validator.*") 
-  title: "(?i)wonka"
   addcomment: "/cc @maxandersen"
