@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.lang.System.*;
 import static picocli.CommandLine.*;
@@ -81,9 +82,13 @@ class issue_labeler implements Callable<Integer> {
 
 
         Set<String> labels = new HashSet<>();
+        Set<String> comments = new HashSet<>();
         for(Rule rule:rules) {
             if(rule.matches(title.orElse(""), description.orElse(""))) {
                 labels.addAll(rule.getLabels());
+            }
+            if(rule.getAddcomment()!=null) {
+                comments.add(rule.getAddcomment());
             }
         }
 
@@ -94,6 +99,11 @@ class issue_labeler implements Callable<Integer> {
             GHIssue issue = github.getRepositoryById(repository_id.orElseThrow())
                                     .getIssue(Integer.parseInt(issue_number.orElseThrow()));
             issue.addLabels(labels.toArray(new String[0]));
+
+            if(!comments.isEmpty()) {
+                issue.comment(comments.stream().collect(Collectors.joining("\n")));
+            }
+            
             System.out.println(issue_url.get());
         }
         return 0;
@@ -125,6 +135,16 @@ class issue_labeler implements Callable<Integer> {
         String expression;
         Pattern title;
         Pattern description;
+
+        public String getAddcomment() {
+            return addcomment;
+        }
+
+        public void setAddcomment(String addcomment) {
+            this.addcomment = addcomment;
+        }
+
+        String addcomment;
 
         public String getTitle() {
             return title.toString();
