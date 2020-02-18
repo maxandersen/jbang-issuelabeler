@@ -31,7 +31,7 @@ class issue_labeler implements Callable<Integer> {
     String githubRepository;
     */
 
-    @Option(names={"--eventpath"}, defaultValue = "${env:GITHUB_EVENTPATH}",
+    @Option(names={"--eventpath"}, defaultValue = "${env:GITHUB_EVENT_PATH}",
             description = "Path to read webhook event data", required = true)
     String githubEventpath;
 
