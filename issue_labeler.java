@@ -21,6 +21,7 @@ import picocli.CommandLine.Parameters;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -49,7 +50,7 @@ class issue_labeler implements Callable<Integer> {
 
 
     @Option(names={"--config"}, defaultValue = ".github/autoissuelabeler.yml")
-    File config;
+    String config;
 
     public static void main(String... args) {
         int exitCode = new CommandLine(new issue_labeler()).execute(args);
@@ -97,7 +98,19 @@ class issue_labeler implements Callable<Integer> {
     }
 
     private List<Rule> getRules() throws IOException {
-        return new ObjectMapper(new YAMLFactory()).readValue(config, new TypeReference<List<Rule>>(){});
+        List<Rule> allRules = new ArrayList<>();
+        var mapper = new ObjectMapper(new YAMLFactory());
+
+        if(config!=null) {
+            if(config.startsWith("file://") || config.startsWith("https://")) {
+                URL url = new URL(config);
+                allRules.addAll(mapper.readValue(url, new TypeReference<List<Rule>>(){}));
+            } else {
+                allRules.addAll(mapper.readValue(new File(config), new TypeReference<List<Rule>>(){}));
+            }
+        }
+
+        return allRules;
     }
 
     private JsonNode loadEventData() throws java.io.IOException {
