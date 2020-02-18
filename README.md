@@ -13,6 +13,8 @@ title and description content.
 
 ### Example usage
 
+CONFIG defaults to be `.github/autolabeler.yml` which requires you to use checkout
+which can take unnecessary time thus recommendation is to pass a URL to CONFIG instead.
 
 ```
 on:
@@ -24,10 +26,9 @@ jobs:
       runs-on: ubuntu-latest
       name: A job to run jbang
       steps:
-      - name: checkout
-        uses: actions/checkout@v1
       - name: issuelabeler
         uses: maxandersen/jbang-issuelabeler@master
         env:
           GITHUB_TOKEN: ${{ secrets.ISSUE_GITHUB_TOKEN }}
+          CONFIG: https://raw.githubusercontent.com/maxandersen/githubaction-testinggrounds/master/.github/autoissuelabeler.yml
 ```

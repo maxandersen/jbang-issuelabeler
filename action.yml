@@ -1,12 +1,9 @@
-name: 'Java Scripting w/jbang'
-description: 'Run java as scripts with https:/github.com/maxandersen/jbang from your github repo'
+name: 'jbang issue labeler'
+description: 'Add labels on issues based on regular expression or EL expression'
 branding:
   icon: hash
   color: red
 inputs:
-  script:
-      description: 'Script file to run'
-      required: true
   args:
       description: 'arguments to pass on to the script'
       required: false
@@ -14,5 +11,4 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
-    - ${{ inputs.script }}
     - ${{ inputs.args }}

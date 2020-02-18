@@ -168,6 +168,7 @@ class issue_labeler implements Callable<Integer> {
                 return true;
             }
 
+            expression = "${" + expression + "}";
 
             //https://www.programcreek.com/java-api-examples/?api=javax.el.ExpressionFactory
             var elfactory = ELManager.getExpressionFactory();
@@ -175,8 +176,9 @@ class issue_labeler implements Callable<Integer> {
             ELContext context = new StandardELContext(elfactory);
             context.getVariableMapper().setVariable("title", elfactory.createValueExpression(issue_title, String.class));
             context.getVariableMapper().setVariable("description", elfactory.createValueExpression(issue_title, String.class));
+            context.getVariableMapper().setVariable("title_description", elfactory.createValueExpression(issue_title + "\n" + issue_description, String.class));
 
-            System.out.println(expression);
+            //System.out.println(expression);
             var ve = elfactory.createValueExpression(context, expression, Boolean.class);
 
             var value = (Boolean)ve.getValue(context);

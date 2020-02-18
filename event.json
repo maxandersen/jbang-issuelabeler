@@ -60,7 +60,7 @@
     "created_at": "2020-01-14T04:55:29Z",
     "default_branch": "master",
     "deployments_url": "https://api.github.com/repos/maxandersen/githubaction-testinggrounds/deployments",
-    "description": null,
+    "description": "im a validator",
     "disabled": false,
     "downloads_url": "https://api.github.com/repos/maxandersen/githubaction-testinggrounds/downloads",
     "events_url": "https://api.github.com/repos/maxandersen/githubaction-testinggrounds/events",
