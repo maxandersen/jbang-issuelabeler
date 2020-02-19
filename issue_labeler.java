@@ -74,6 +74,11 @@ class issue_labeler implements Callable<Integer> {
 
         List<Rule> rules = getRules();
 
+        if(data.has("pull_request")) {
+            System.out.println("Ignoring pull request");
+            return ExitCode.OK;
+        }
+
         Optional<String> title = Optional.ofNullable(data.get("issue").get("title")).map(JsonNode::asText);
         Optional<String> description = Optional.ofNullable(data.get("issue").get("description")).map(JsonNode::asText);
         Optional<String> repository_id = Optional.ofNullable(data.get("repository").get("id")).map(JsonNode::asText);
