@@ -82,6 +82,10 @@ class issue_labeler implements Callable<Integer> {
             return ExitCode.OK;
         }
 
+        if(data.get("action")==null || !"opened".equals(data.get("action").asText())) {
+            System.out.println("Ignoring this action - only allow opened action");
+        }
+
         Optional<String> title = Optional.ofNullable(data.get("issue").get("title")).map(JsonNode::asText);
         Optional<String> description = Optional.ofNullable(data.get("issue").get("description")).map(JsonNode::asText);
         Optional<String> repository_id = Optional.ofNullable(data.get("repository").get("id")).map(JsonNode::asText);
@@ -199,22 +203,26 @@ class issue_labeler implements Callable<Integer> {
                 return true;
             }
 
-            expression = "${" + expression + "}";
+            if(expression!=null && !expression.trim().isEmpty()) {
+                expression = "${" + expression + "}";
 
-            //https://www.programcreek.com/java-api-examples/?api=javax.el.ExpressionFactory
-            var elfactory = ELManager.getExpressionFactory();
+                //https://www.programcreek.com/java-api-examples/?api=javax.el.ExpressionFactory
+                var elfactory = ELManager.getExpressionFactory();
 
-            ELContext context = new StandardELContext(elfactory);
-            context.getVariableMapper().setVariable("title", elfactory.createValueExpression(issue_title, String.class));
-            context.getVariableMapper().setVariable("description", elfactory.createValueExpression(issue_title, String.class));
-            context.getVariableMapper().setVariable("title_description", elfactory.createValueExpression(issue_title + "\n" + issue_description, String.class));
+                ELContext context = new StandardELContext(elfactory);
+                context.getVariableMapper().setVariable("title", elfactory.createValueExpression(issue_title, String.class));
+                context.getVariableMapper().setVariable("description", elfactory.createValueExpression(issue_title, String.class));
+                context.getVariableMapper().setVariable("title_description", elfactory.createValueExpression(issue_title + "\n" + issue_description, String.class));
 
-            //System.out.println(expression);
-            var ve = elfactory.createValueExpression(context, expression, Boolean.class);
+                //System.out.println(expression);
+                var ve = elfactory.createValueExpression(context, expression, Boolean.class);
 
-            var value = (Boolean)ve.getValue(context);
+                var value = (Boolean) ve.getValue(context);
 
-            return value;
+                return value != null ? value : false;
+            }
+
+            return false;
         }
     }
 
