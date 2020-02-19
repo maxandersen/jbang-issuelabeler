@@ -55,6 +55,9 @@ class issue_labeler implements Callable<Integer> {
     @Option(names={"--config"}, defaultValue = "${CONFIG:-.github/autoissuelabeler.yml}")
     String config;
 
+    @Option(names={"--noop"}, defaultValue = "false")
+    boolean noop;
+
     public static void main(String... args) {
         int exitCode = new CommandLine(new issue_labeler()).execute(args);
         exit(exitCode);
@@ -101,14 +104,17 @@ class issue_labeler implements Callable<Integer> {
             System.out.println("No labels to apply.");
         } else {
             System.out.printf("#%s %s:%s\n", issue_number.orElse("N/A"), title.orElse("N/A"), labels);
-            GHIssue issue = github.getRepositoryById(repository_id.orElseThrow())
+            if(noop) {
+                System.out.println("noop - not adding labels nor comments");
+            } else {
+                GHIssue issue = github.getRepositoryById(repository_id.orElseThrow())
                                     .getIssue(Integer.parseInt(issue_number.orElseThrow()));
-            issue.addLabels(labels.toArray(new String[0]));
+                issue.addLabels(labels.toArray(new String[0]));
 
-            if(!comments.isEmpty()) {
-                issue.comment(comments.stream().collect(Collectors.joining("\n")));
-            }
-            
+                if(!comments.isEmpty())
+                    issue.comment(comments.stream().collect(Collectors.joining("\n")));
+                }
+
             System.out.println(issue_url.get());
         }
         return 0;

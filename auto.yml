@@ -1,7 +1,7 @@
-- labels: [area/hibernate, need-review]
+- labels: [area/hibernate]
   
   expression: |
               title_description.matches("(?is).*hibernate.*") 
               and
               !title_description.matches("(?is).*validator.*") 
-  addcomment: "/cc @maxandersen"
+  #addcomment: "/cc @maxandersen"
