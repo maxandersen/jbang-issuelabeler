@@ -98,16 +98,16 @@ class issue_labeler implements Callable<Integer> {
         for(Rule rule:rules) {
             if(rule.matches(title.orElse(""), description.orElse(""))) {
                 labels.addAll(rule.getLabels());
-            }
-            if(rule.getAddcomment()!=null) {
-                comments.add(rule.getAddcomment());
+                if(rule.getAddcomment()!=null) {
+                    comments.add(rule.getAddcomment());
+                }
             }
         }
 
         if(labels.isEmpty()) {
             System.out.println("No labels to apply.");
         } else {
-            System.out.printf("#%s %s:%s\n", issue_number.orElse("N/A"), title.orElse("N/A"), labels);
+            System.out.printf("#%s %s:%s {%s}\n", issue_number.orElse("N/A"), title.orElse("N/A"), labels, comments);
             if(noop) {
                 System.out.println("noop - not adding labels nor comments");
             } else {
