@@ -46,7 +46,11 @@ To define what should be labelled create a file in `.github/autolabeler.yml`
               title_description.matches("(?is).*hibernate.*") 
               and
               !title_description.matches("(?is).*validator.*") 
-  addcomment: "/cc @maxandersen"
+  addcomment: "Validator are the bees knees!"
+  notify:
+    - maxandersen
+    - gsmet
+    - sanne
 - labels: [bug]
   title: "^[bug] .*"
 ```
@@ -58,5 +62,6 @@ Each item is a "rule" and the meaning of each attribute is as follows:
 |labels     | list of labels to add if match found | `[area/hibernate, triage]`
 |title      | Java regular expression to match against issue title. | `(?i).*qute.*` |
 |description | Java regular expression to match against issue description. Useful to use `(?si)` to activate matching across newlines and ignore casing. | `(?si).*qute.*`
-|expression | javax.el expression that should evaluate to a boolean. Can refer to `title`, `description`, `title_description` attributes. | `title.matches(".*hibernate.*") and !description.contains(".*validator.*") |
-|addcomment | free-form text which will be added as a comment | `/cc @maxandersen please review`
+|expression | javax.el expression that should evaluate to a boolean. Can refer to `title`, `description`, `title_description` attributes. | `title.matches(".*hibernate.*") and !description.contains(".*validator.*")` |
+|addcomment | free-form text which will be added as a comment | `/cc @maxandersen please review` |
+|notify | array of usernames or groups to notify in a comment. If user created the issue he will not be notified. | `[maxandersen,sanne]` |

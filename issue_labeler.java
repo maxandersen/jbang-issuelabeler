@@ -71,11 +71,12 @@ class issue_labeler implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
 
+        List<Rule> rules = getRules();
+
         GitHub github = new GitHubBuilder().withOAuthToken(githubToken).build();
 
         var data = loadEventData();
 
-        List<Rule> rules = getRules();
 
         if(data.has("pull_request")) {
             System.out.println("Ignoring pull request");
@@ -87,6 +88,7 @@ class issue_labeler implements Callable<Integer> {
         }
 
         Optional<String> title = Optional.ofNullable(data.get("issue").get("title")).map(JsonNode::asText);
+        Optional<String> user = Optional.ofNullable(data.get("issue").get("user").get("login")).map(JsonNode::asText);
         Optional<String> description = Optional.ofNullable(data.get("issue").get("description")).map(JsonNode::asText);
         Optional<String> repository_id = Optional.ofNullable(data.get("repository").get("id")).map(JsonNode::asText);
         Optional<String> issue_number = Optional.ofNullable(data.get("issue").get("number")).map(JsonNode::asText);
@@ -95,9 +97,20 @@ class issue_labeler implements Callable<Integer> {
 
         Set<String> labels = new HashSet<>();
         Set<String> comments = new HashSet<>();
+
         for(Rule rule:rules) {
             if(rule.matches(title.orElse(""), description.orElse(""))) {
                 labels.addAll(rule.getLabels());
+
+                if(rule.getNotify()!=null && !rule.getNotify().isEmpty()) {
+                    var res = rule.getNotify().stream()
+                            .filter(usr -> { return !usr.equals(user.get());  })
+                            .map(usr -> { return "@" + usr; })
+                            .collect(Collectors.joining(", "));
+
+
+                    comments.add("/cc " + res);
+                }
                 if(rule.getAddcomment()!=null) {
                     comments.add(rule.getAddcomment());
                 }
@@ -109,7 +122,7 @@ class issue_labeler implements Callable<Integer> {
         } else {
             System.out.printf("#%s %s:%s {%s}\n", issue_number.orElse("N/A"), title.orElse("N/A"), labels, comments);
             if(noop) {
-                System.out.println("noop - not adding labels nor comments");
+                System.out.println("noop - not actually adding labels nor comments");
             } else {
                 GHIssue issue = github.getRepositoryById(repository_id.orElseThrow())
                                     .getIssue(Integer.parseInt(issue_number.orElseThrow()));
@@ -150,6 +163,8 @@ class issue_labeler implements Callable<Integer> {
         String expression;
         Pattern title;
         Pattern description;
+        String addcomment;
+        List<String> notify;
 
         public String getAddcomment() {
             return addcomment;
@@ -159,7 +174,6 @@ class issue_labeler implements Callable<Integer> {
             this.addcomment = addcomment;
         }
 
-        String addcomment;
 
         public String getTitle() {
             return title.toString();
@@ -184,6 +198,13 @@ class issue_labeler implements Callable<Integer> {
             this.expression = expression;
         }
 
+        public void setNotify(List<String> notify) {
+            this.notify = notify;
+        }
+
+        public List<String> getNotify() {
+            return notify;
+        }
 
         public List<String> getLabels() {
             return labels;
