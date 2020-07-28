@@ -109,7 +109,9 @@ class issue_labeler implements Callable<Integer> {
                             .collect(Collectors.joining(", "));
 
 
-                    comments.add("/cc " + res);
+                    if(!res.isBlank()) {
+                        comments.add("/cc " + res);
+                    }
                 }
                 if(rule.getAddcomment()!=null) {
                     comments.add(rule.getAddcomment());
